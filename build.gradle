@@ -1,0 +1,20 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.5.30'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.30'
+
+    id 'net.mamoe.mirai-console' version '2.9.2'
+}
+
+group = 'com.github'
+version = '1.0-SNAPSHOT'
+
+dependencies{
+    implementation 'com.kennycason:kumo-core:1.28'
+    implementation 'com.kennycason:kumo-tokenizers:1.28'
+    implementation 'com.huaban:jieba-analysis:1.0.2'
+}
+
+repositories {
+    maven { url 'https://maven.aliyun.com/repository/public' }
+    mavenCentral()
+}
