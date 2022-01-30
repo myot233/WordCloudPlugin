@@ -27,7 +27,7 @@ object WordCloudUtils {
             }
         }
         val wordFrequencies = frequencyAnalyzer.load(text)
-        val dimension = Dimension(800, 800)
+        val dimension = Dimension(WordCloudConfig.width, WordCloudConfig.height)
         val wordCloud = WordCloud(dimension, CollisionMode.PIXEL_PERFECT)
         wordCloud.setPadding(2)
         wordCloud.setKumoFont(
@@ -39,7 +39,7 @@ object WordCloudUtils {
         val colors = WordCloudConfig.colorList
         wordCloud.setBackground(when(WordCloudConfig.backgroundMode)
         {
-            BackGround.CIRCLE -> CircleBackground(400)
+            BackGround.CIRCLE -> CircleBackground(((WordCloudConfig.height+WordCloudConfig.width)/4))
             BackGround.IMAGE  -> PixelBoundaryBackground(File(WordCloudConfig.imagePath!!))
         }
         )
