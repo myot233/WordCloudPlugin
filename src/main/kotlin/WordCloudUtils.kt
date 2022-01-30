@@ -47,7 +47,7 @@ object WordCloudUtils {
         wordCloud.setColorPalette(
             ColorPalette(colors.map { it.toIntOrNull(16)?.let { it1 -> Color(it1) } })
         )
-        wordCloud.setFontScalar(LinearFontScalar(20, 100))
+        wordCloud.setFontScalar(LinearFontScalar(WordCloudConfig.minFontSize, WordCloudConfig.maxFontSize))
         wordCloud.build(wordFrequencies)
         val stream = ByteArrayOutputStream()
         wordCloud.writeToStreamAsPNG(stream)

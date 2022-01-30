@@ -11,6 +11,13 @@ object WordCloudConfig : AutoSavePluginConfig("config") {
     @ValueDescription("设置背景高度")
     val height:Int by value(1000)
 
+    @ValueDescription("设置最小文字大小")
+    val minFontSize:Int by value(10)
+
+    @ValueDescription("设置最大文字大小")
+    val maxFontSize:Int by value(40)
+
+
     @ValueDescription("设置词云的背景模式,可选 CIRCLE,IMAGE两种")
     val backgroundMode:BackGround by value(BackGround.CIRCLE)
 
