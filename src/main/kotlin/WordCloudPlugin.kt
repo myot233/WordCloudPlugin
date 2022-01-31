@@ -4,6 +4,7 @@ import net.mamoe.mirai.console.command.CommandManager
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandSender.Companion.toCommandSender
 import net.mamoe.mirai.console.command.descriptor.ExperimentalCommandDescriptors
+import net.mamoe.mirai.console.command.execute
 import net.mamoe.mirai.console.data.PluginDataStorage
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
@@ -32,21 +33,37 @@ object WordCloudPlugin : KotlinPlugin(
         logger.info { "WordCloudPlugin Plugin loaded" }
         WordCloudPluginData.reload()
         WordCloudConfig.reload()
+        CommandAliasConfig.reload()
         WordCloudCommand.register()
-        this.globalEventChannel().subscribe<GroupMessageEvent>{
-            if(!WordCloudPluginData.hasGroup(this.group.id)){
+        this.globalEventChannel().subscribe<GroupMessageEvent> {
+            val msg = it.message.contentToString()
+            if (!WordCloudPluginData.hasGroup(this.group.id)) {
                 WordCloudPluginData.addGroup(this.group.id)
             }
             val date = SimpleDateFormat("yyyy-MM-dd").format(Date())
-            WordCloudPluginData.getGroup(this.group.id,date).add(this.message.filterIsInstance<PlainText>().joinToString{
-                it.contentToString()
-            })
+            WordCloudPluginData.getGroup(this.group.id, date)
+                .add(this.message.filterIsInstance<PlainText>().joinToString {
+                    msg
+                })
+
+            when (msg) {
+                CommandAliasConfig.todayWordCloud -> {
+                    WordCloudCommand.execute(this.toCommandSender(), CommandAliasConfig.todayWordCloud, false)
+                }
+                CommandAliasConfig.yesterdayWordCloud -> {
+                    WordCloudCommand.execute(this.toCommandSender(), CommandAliasConfig.todayWordCloud, false)
+                }
+                else -> {
+                    if (msg.startsWith(CommandAliasConfig.getWordCloud)) {
+                        val time = msg.removePrefix(CommandAliasConfig.getWordCloud).trim().split(" ")[0]
+                        WordCloudCommand.execute(this.toCommandSender(), "${CommandAliasConfig.getWordCloud} $time", false)
+                    }
+
+                }
+            }
             return@subscribe ListeningStatus.LISTENING
 
         }
-        this.globalEventChannel().subscribe<MessageEvent> {
-            CommandManager.executeCommand(this.toCommandSender(), message, false)
-            return@subscribe ListeningStatus.LISTENING
-        }
+
     }
 }

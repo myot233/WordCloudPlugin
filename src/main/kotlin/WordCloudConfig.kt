@@ -25,7 +25,10 @@ object WordCloudConfig : AutoSavePluginConfig("config") {
     val imagePath:String? by value()
 
     @ValueDescription("给/WordCloud设置别名")
-    val alias: MutableList<String> by value()
+    val alias: MutableList<String> by value(mutableListOf("词云"))
+
+    @ValueDescription("选择分词器,可选 JIEBA,KUMO 两种")
+    val tokenizer:Tokenizer by value(Tokenizer.KUMO)
 
     @ValueDescription("设置词云的字体")
     val fontPath: String by value("default")

@@ -20,12 +20,7 @@ object WordCloudUtils {
         val frequencyAnalyzer = FrequencyAnalyzer()
         frequencyAnalyzer.setWordFrequenciesToReturn(300)
         frequencyAnalyzer.setMinWordLength(2)
-        frequencyAnalyzer.setWordTokenizer { it ->
-            val segmenter = JiebaSegmenter()
-            segmenter.process(it, JiebaSegmenter.SegMode.INDEX).map {
-                it.word.trim()
-            }
-        }
+        frequencyAnalyzer.setWordTokenizer(WordCloudConfig.tokenizer.instance)
         val wordFrequencies = frequencyAnalyzer.load(text)
         val dimension = Dimension(WordCloudConfig.width, WordCloudConfig.height)
         val wordCloud = WordCloud(dimension, CollisionMode.PIXEL_PERFECT)
