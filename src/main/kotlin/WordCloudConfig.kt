@@ -32,7 +32,7 @@ object WordCloudConfig : AutoSavePluginConfig("config") {
     val alias: MutableList<String> by value(mutableListOf("词云"))
 
     @ValueDescription("选择分词器,可选 JIEBA,KUMO 两种")
-    val tokenizer:Tokenizer by value(Tokenizer.KUMO)
+    val tokenizer:Tokenizers by value(Tokenizers.KUMO)
 
     @ValueDescription("设置词云的字体")
     val fontPath: String by value("default")
