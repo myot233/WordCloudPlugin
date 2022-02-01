@@ -22,7 +22,7 @@ object WordCloudPlugin : KotlinPlugin(
     JvmPluginDescription(
         id = "com.github.WordCloudPlugin",
         name = "WordCloudPlugin",
-        version = "0.0.1",
+        version = "0.0.3",
     ) {
         author("gsycl2004")
         info("""a plugin that can easily generate wordcloud image of group""")
@@ -35,17 +35,24 @@ object WordCloudPlugin : KotlinPlugin(
         WordCloudConfig.reload()
         CommandAliasConfig.reload()
         WordCloudCommand.register()
-        this.globalEventChannel().subscribe<GroupMessageEvent> {
-            val msg = it.message.contentToString()
+        this.globalEventChannel().subscribe<GroupMessageEvent> { groupMessageEvent ->
+            var msg = groupMessageEvent.message.contentToString()
             if (!WordCloudPluginData.hasGroup(this.group.id)) {
                 WordCloudPluginData.addGroup(this.group.id)
             }
             val date = SimpleDateFormat("yyyy-MM-dd").format(Date())
-            WordCloudPluginData.getGroup(this.group.id, date)
-                .add(this.message.filterIsInstance<PlainText>().joinToString {
-                    msg
-                })
+            WordCloudConfig.regexs.forEach {
+                msg = msg.replace(it.toRegex(), "")
 
+            }
+            if (msg.trim() != "") WordCloudPluginData.getGroup(this.group.id, date).add(msg.trim())
+
+
+            return@subscribe ListeningStatus.LISTENING
+
+        }
+        this.globalEventChannel().subscribe<GroupMessageEvent> {
+            val msg = this.message.contentToString()
             when (msg) {
                 CommandAliasConfig.todayWordCloud -> {
                     WordCloudCommand.execute(this.toCommandSender(), CommandAliasConfig.todayWordCloud, false)
@@ -56,13 +63,16 @@ object WordCloudPlugin : KotlinPlugin(
                 else -> {
                     if (msg.startsWith(CommandAliasConfig.getWordCloud)) {
                         val time = msg.removePrefix(CommandAliasConfig.getWordCloud).trim().split(" ")[0]
-                        WordCloudCommand.execute(this.toCommandSender(), "${CommandAliasConfig.getWordCloud} $time", false)
+                        WordCloudCommand.execute(
+                            this.toCommandSender(),
+                            "${CommandAliasConfig.getWordCloud} $time",
+                            false
+                        )
                     }
 
                 }
             }
             return@subscribe ListeningStatus.LISTENING
-
         }
 
     }

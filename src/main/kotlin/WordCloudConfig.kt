@@ -17,6 +17,10 @@ object WordCloudConfig : AutoSavePluginConfig("config") {
     @ValueDescription("设置最大文字大小")
     val maxFontSize:Int by value(40)
 
+    @ValueDescription("将自动过滤匹配到的内容")
+    val regexs:List<String> by value(listOf(
+        "[1-9][0-9]{4,14}",
+    ))
 
     @ValueDescription("设置词云的背景模式,可选 CIRCLE,IMAGE两种")
     val backgroundMode:BackGround by value(BackGround.CIRCLE)
