@@ -22,7 +22,7 @@ object WordCloudPlugin : KotlinPlugin(
     JvmPluginDescription(
         id = "com.github.WordCloudPlugin",
         name = "WordCloudPlugin",
-        version = "0.0.3",
+        version = "0.0.4",
     ) {
         author("gsycl2004")
         info("""a plugin that can easily generate wordcloud image of group""")

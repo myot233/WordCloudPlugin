@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.github'
-version = '0.0.3'
+version = '0.0.4'
 
 dependencies{
     implementation 'com.kennycason:kumo-core:1.28'
