@@ -52,20 +52,19 @@ object WordCloudPlugin : KotlinPlugin(
 
         }
         this.globalEventChannel().subscribe<GroupMessageEvent> {
-            val msg = this.message.contentToString()
-            when (msg) {
+            when (val msg = this.message.contentToString()) {
                 CommandAliasConfig.todayWordCloud -> {
-                    WordCloudCommand.execute(this.toCommandSender(), CommandAliasConfig.todayWordCloud, false)
+                    WordCloudCommand.execute(this.toCommandSender(), "本日词云", false)
                 }
                 CommandAliasConfig.yesterdayWordCloud -> {
-                    WordCloudCommand.execute(this.toCommandSender(), CommandAliasConfig.todayWordCloud, false)
+                    WordCloudCommand.execute(this.toCommandSender(), "昨日词云", false)
                 }
                 else -> {
                     if (msg.startsWith(CommandAliasConfig.getWordCloud)) {
                         val time = msg.removePrefix(CommandAliasConfig.getWordCloud).trim().split(" ")[0]
                         WordCloudCommand.execute(
                             this.toCommandSender(),
-                            "${CommandAliasConfig.getWordCloud} $time",
+                            "获取词云 $time",
                             false
                         )
                     }
