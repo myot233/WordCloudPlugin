@@ -38,7 +38,7 @@ object WordCloudCommand : CompositeCommand(
     @Description("获取昨天的词云")
     suspend fun CommandSenderOnMessage<GroupMessageEvent>.yesterdayWordCloud() {
 
-        val date = SimpleDateFormat("yyyy-MM-dd").format(WordCloudUtils.getBeforeDay(Date(),-1))
+        val date = SimpleDateFormat("yyyy-MM-dd").format(WordCloudUtils.getBeforeDay(Date(),1))
         val byte = WordCloudUtils.generateWordCloud(WordCloudPluginData.getGroup(this.fromEvent.group.id, date))
         val exRes = byte.toExternalResource("png")
         val image = this.fromEvent.group.uploadImage(exRes)
