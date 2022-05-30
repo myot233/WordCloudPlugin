@@ -1,71 +1,101 @@
 package com.github
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.mamoe.mirai.console.command.CommandSenderOnMessage
 import net.mamoe.mirai.console.command.CompositeCommand
-import net.mamoe.mirai.contact.Contact.Companion.uploadImage
+import net.mamoe.mirai.contact.User
 import net.mamoe.mirai.event.events.GroupMessageEvent
+import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
-import java.io.File
-import java.io.FileOutputStream
-import java.text.SimpleDateFormat
-import java.util.*
+import org.ktorm.dsl.*
+import org.ktorm.entity.*
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import javax.swing.text.DateFormatter
 
 object WordCloudCommand : CompositeCommand(
     WordCloudPlugin,
-    "WordCloud",
-    description = "the command of wordCloud",
-    secondaryNames = WordCloudConfig.alias.toTypedArray()
+    "wordcloud",
+    "w"
 ) {
-    @SubCommand("本日词云")
-    @Description("获取今天的词云")
-    suspend fun CommandSenderOnMessage<GroupMessageEvent>.todayWordCloud() {
-        val date = SimpleDateFormat("yyyy-MM-dd").format(Date())
-        val byte = WordCloudUtils.generateWordCloud(WordCloudPluginData.getGroup(this.fromEvent.group.id, date))
+    @SubCommand("获取词云")
+    suspend fun CommandSenderOnMessage<GroupMessageEvent>.genGroup(from: String, to: String) {
+        sendMessage(
+            genGroup(
+                LocalDate.parse(from),
+                LocalDate.parse(to)
+            )
+        )
+    }
 
-        val exRes = byte.toExternalResource("png")
-        val image = this.fromEvent.group.uploadImage(exRes)
-        sendMessage(image)
+    @SubCommand("获取用户词云")
+    suspend fun CommandSenderOnMessage<GroupMessageEvent>.genPerson(user: User, from: String, to: String) {
+        sendMessage(
+            genPerson(
+                user,
+                LocalDate.parse(from),
+                LocalDate.parse(to)
+            )
+        )
+    }
 
-        withContext(Dispatchers.IO) {
-            exRes.close()
-        }
+    @SubCommand("本月词云")
+    suspend fun CommandSenderOnMessage<GroupMessageEvent>.genGroupMonth() {
+        sendMessage(genGroup(LocalDate.now().withDayOfMonth(1), LocalDate.now().let {
+            it.withDayOfMonth(it.lengthOfMonth())
+        }))
     }
 
     @SubCommand("昨日词云")
-    @Description("获取昨天的词云")
-    suspend fun CommandSenderOnMessage<GroupMessageEvent>.yesterdayWordCloud() {
-
-        val date = SimpleDateFormat("yyyy-MM-dd").format(WordCloudUtils.getBeforeDay(Date(),1))
-        val byte = WordCloudUtils.generateWordCloud(WordCloudPluginData.getGroup(this.fromEvent.group.id, date))
-        val exRes = byte.toExternalResource("png")
-        val image = this.fromEvent.group.uploadImage(exRes)
-        sendMessage(image)
-
-        withContext(Dispatchers.IO) {
-            exRes.close()
-        }
+    suspend fun CommandSenderOnMessage<GroupMessageEvent>.genGroupYesterday() {
+        sendMessage(genGroup(LocalDate.now().minusDays(1), LocalDate.now().minusDays(1)))
     }
 
-    @SubCommand("获取词云")
-    @Description("获取指定某天的词云 如2022-01-30就是获取22年1月30号的词云")
-    suspend fun CommandSenderOnMessage<GroupMessageEvent>.findWordCloud(time:String) {
-        val byte = WordCloudUtils.generateWordCloud(WordCloudPluginData.getGroup(this.fromEvent.group.id, time))
-        val exRes = byte.toExternalResource("png")
-        val image = this.fromEvent.group.uploadImage(exRes)
-        sendMessage(image)
-
-        withContext(Dispatchers.IO) {
-            exRes.close()
-        }
+    @SubCommand("个人昨日词云")
+    suspend fun CommandSenderOnMessage<GroupMessageEvent>.genPersonYesterday(user: User) {
+        sendMessage(genPerson(user, LocalDate.now().minusDays(1), LocalDate.now().minusDays(1)))
     }
 
-    @SubCommand("帮助")
-    suspend fun CommandSenderOnMessage<GroupMessageEvent>.help(){
-        sendMessage(this@WordCloudCommand.usage)
+    @SubCommand("个人本月词云")
+    suspend fun CommandSenderOnMessage<GroupMessageEvent>.genPersonMonth(user: User) {
+        sendMessage(genPerson(user, LocalDate.now().withDayOfMonth(1), LocalDate.now().let {
+            it.withDayOfMonth(it.lengthOfMonth())
+        }))
     }
 
+    @SubCommand("个人本日词云")
+    suspend fun CommandSenderOnMessage<GroupMessageEvent>.genPersonToday(user: User) {
+        sendMessage(genPerson(user, LocalDate.now(), LocalDate.now()))
+    }
+
+    @SubCommand("本日词云")
+    suspend fun CommandSenderOnMessage<GroupMessageEvent>.genGroupToday() {
+        sendMessage(genGroup(LocalDate.now(), LocalDate.now()))
+    }
+
+
+    private suspend fun CommandSenderOnMessage<GroupMessageEvent>.genGroup(from: LocalDate, to: LocalDate): Image {
+        val sequence = WordCloudTable.connect()
+        val texts = sequence.filter {
+            it.group_id eq this.fromEvent.group.id
+        }.filter {
+            it.time between from..to
+        }.map { it.text }.toList()
+        return fromEvent.group.uploadImage(WordCloudUtils.generateWordCloud(texts).toExternalResource("png"))
+    }
+
+    private suspend fun CommandSenderOnMessage<GroupMessageEvent>.genPerson(
+        user: User,
+        from: LocalDate,
+        to: LocalDate
+    ): Image {
+        val sequence = WordCloudTable.connect()
+        val texts = sequence.filter {
+            it.sender_id eq user.id
+        }.filter {
+            it.time between from..to
+        }.map { it.text }.toList()
+        return fromEvent.group.uploadImage(WordCloudUtils.generateWordCloud(texts).toExternalResource("png"))
+    }
 
 }

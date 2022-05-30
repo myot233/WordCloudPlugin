@@ -16,7 +16,7 @@ import java.io.File
 import java.util.*
 
 object WordCloudUtils {
-    fun generateWordCloud(text: MutableList<String>): ByteArray {
+    fun generateWordCloud(text: List<String>): ByteArray {
         val frequencyAnalyzer = FrequencyAnalyzer()
         frequencyAnalyzer.setWordFrequenciesToReturn(300)
         frequencyAnalyzer.setMinWordLength(2)

@@ -1,18 +1,23 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.5.30'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.30'
-
-    id 'net.mamoe.mirai-console' version '2.9.2'
+    id 'org.jetbrains.kotlin.jvm' version '1.6.10'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.6.10'
+    id 'net.mamoe.mirai-console' version '2.11.0'
 }
 
 group = 'com.github'
 version = '0.0.4'
 
+
+
+
 dependencies{
     implementation 'com.kennycason:kumo-core:1.28'
     implementation 'com.kennycason:kumo-tokenizers:1.28'
     implementation 'com.huaban:jieba-analysis:1.0.2'
+    implementation 'org.ktorm:ktorm-core:3.4.1'
+    implementation 'org.xerial:sqlite-jdbc:3.36.0.3'
 }
+
 
 repositories {
     maven { url 'https://maven.aliyun.com/repository/public' }
