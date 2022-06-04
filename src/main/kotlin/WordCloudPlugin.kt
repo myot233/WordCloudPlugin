@@ -31,7 +31,7 @@ import java.util.*
 object WordCloudPlugin : KotlinPlugin(JvmPluginDescription(
     id = "com.github.WordCloudPlugin",
     name = "WordCloudPlugin",
-    version = "0.0.4",
+    version = "0.0.6",
 ) {
     author("gsycl2004")
     info("""a plugin that can easily generate wordcloud image of group""")
