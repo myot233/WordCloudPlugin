@@ -7,6 +7,7 @@ import com.kennycason.kumo.bg.CircleBackground
 import com.kennycason.kumo.bg.PixelBoundaryBackground
 import com.kennycason.kumo.font.KumoFont
 import com.kennycason.kumo.font.scale.LinearFontScalar
+import com.kennycason.kumo.image.AngleGenerator
 import com.kennycason.kumo.nlp.FrequencyAnalyzer
 import com.kennycason.kumo.palette.ColorPalette
 import java.awt.Color
@@ -25,6 +26,7 @@ object WordCloudUtils {
         val dimension = Dimension(WordCloudConfig.width, WordCloudConfig.height)
         val wordCloud = WordCloud(dimension, CollisionMode.PIXEL_PERFECT)
         wordCloud.setPadding(2)
+        wordCloud.setAngleGenerator(AngleGenerator(0))
         wordCloud.setKumoFont(
             if (WordCloudConfig.fontPath == "default")
                 KumoFont(WordCloudPlugin.getResourceAsStream("萝莉体.ttf"))
@@ -49,12 +51,5 @@ object WordCloudUtils {
         return stream.toByteArray()
     }
 
-    fun getBeforeDay(date: Date = Date(), before: Int = 1): Date {
-        var date = date
-        val calendar = Calendar.getInstance()
-        calendar.time = date
-        calendar.add(Calendar.DAY_OF_MONTH, -before)
-        date = calendar.time
-        return date
-    }
+
 }
