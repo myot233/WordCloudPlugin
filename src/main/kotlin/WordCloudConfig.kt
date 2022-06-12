@@ -4,6 +4,25 @@ import net.mamoe.mirai.console.data.AutoSavePluginConfig
 import net.mamoe.mirai.console.data.ValueDescription
 import net.mamoe.mirai.console.data.value
 
+object TimerConfig:AutoSavePluginConfig("timer"){
+    @ValueDescription("这里用来存放定时任务")
+    val tasks:MutableList<WordCloudTask> by value(
+        mutableListOf(
+            WordCloudTask(
+                "14:00:00",
+                114514L,
+                "hello",
+                "today"
+            )
+        )
+    )
+}
+
+
+@kotlinx.serialization.Serializable
+data class WordCloudTask(val time:String,val group:Long,val text:String,val type:String)
+
+
 object WordCloudConfig : AutoSavePluginConfig("config") {
     @ValueDescription("设置背景宽度")
     val width:Int by value(1000)

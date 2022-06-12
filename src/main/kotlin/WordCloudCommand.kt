@@ -2,6 +2,8 @@ package com.github
 
 import net.mamoe.mirai.console.command.CommandSenderOnMessage
 import net.mamoe.mirai.console.command.CompositeCommand
+import net.mamoe.mirai.console.command.GroupTempCommandSender
+import net.mamoe.mirai.console.command.MemberCommandSender
 import net.mamoe.mirai.contact.User
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.Image
@@ -19,7 +21,7 @@ object WordCloudCommand : CompositeCommand(
     "w"
 ) {
     @SubCommand("获取词云")
-    suspend fun CommandSenderOnMessage<GroupMessageEvent>.genGroup(from: String, to: String) {
+    suspend fun MemberCommandSender.genGroup(from: String, to: String) {
         sendMessage(
             genGroup(
                 LocalDate.parse(from),
@@ -29,7 +31,7 @@ object WordCloudCommand : CompositeCommand(
     }
 
     @SubCommand("获取用户词云")
-    suspend fun CommandSenderOnMessage<GroupMessageEvent>.genPerson(user: User, from: String, to: String) {
+    suspend fun MemberCommandSender.genPerson(user: User, from: String, to: String) {
         sendMessage(
             genPerson(
                 user,
@@ -40,51 +42,51 @@ object WordCloudCommand : CompositeCommand(
     }
 
     @SubCommand("本月词云")
-    suspend fun CommandSenderOnMessage<GroupMessageEvent>.genGroupMonth() {
+    suspend fun MemberCommandSender.genGroupMonth() {
         sendMessage(genGroup(LocalDate.now().withDayOfMonth(1), LocalDate.now().let {
             it.withDayOfMonth(it.lengthOfMonth())
         }))
     }
 
     @SubCommand("昨日词云")
-    suspend fun CommandSenderOnMessage<GroupMessageEvent>.genGroupYesterday() {
+    suspend fun MemberCommandSender.genGroupYesterday() {
         sendMessage(genGroup(LocalDate.now().minusDays(1), LocalDate.now().minusDays(1)))
     }
 
     @SubCommand("个人昨日词云")
-    suspend fun CommandSenderOnMessage<GroupMessageEvent>.genPersonYesterday(user: User) {
+    suspend fun MemberCommandSender.genPersonYesterday(user: User) {
         sendMessage(genPerson(user, LocalDate.now().minusDays(1), LocalDate.now().minusDays(1)))
     }
 
     @SubCommand("个人本月词云")
-    suspend fun CommandSenderOnMessage<GroupMessageEvent>.genPersonMonth(user: User) {
+    suspend fun MemberCommandSender.genPersonMonth(user: User) {
         sendMessage(genPerson(user, LocalDate.now().withDayOfMonth(1), LocalDate.now().let {
             it.withDayOfMonth(it.lengthOfMonth())
         }))
     }
 
     @SubCommand("个人本日词云")
-    suspend fun CommandSenderOnMessage<GroupMessageEvent>.genPersonToday(user: User) {
+    suspend fun MemberCommandSender.genPersonToday(user: User) {
         sendMessage(genPerson(user, LocalDate.now(), LocalDate.now()))
     }
 
     @SubCommand("本日词云")
-    suspend fun CommandSenderOnMessage<GroupMessageEvent>.genGroupToday() {
+    suspend fun MemberCommandSender.genGroupToday() {
         sendMessage(genGroup(LocalDate.now(), LocalDate.now()))
     }
 
 
-    private suspend fun CommandSenderOnMessage<GroupMessageEvent>.genGroup(from: LocalDate, to: LocalDate): Image {
+    private suspend fun MemberCommandSender.genGroup(from: LocalDate, to: LocalDate): Image {
         val sequence = WordCloudTable.connect()
         val texts = sequence.filter {
-            it.group_id eq this.fromEvent.group.id
+            it.group_id eq this.group.id
         }.filter {
             it.time between from..to
         }.map { it.text }.toList()
-        return fromEvent.group.uploadImage(WordCloudUtils.generateWordCloud(texts).toExternalResource("png"))
+        return group.uploadImage(WordCloudUtils.generateWordCloud(texts).toExternalResource("png"))
     }
 
-    private suspend fun CommandSenderOnMessage<GroupMessageEvent>.genPerson(
+    private suspend fun MemberCommandSender.genPerson(
         user: User,
         from: LocalDate,
         to: LocalDate
@@ -95,7 +97,7 @@ object WordCloudCommand : CompositeCommand(
         }.filter {
             it.time between from..to
         }.map { it.text }.toList()
-        return fromEvent.group.uploadImage(WordCloudUtils.generateWordCloud(texts).toExternalResource("png"))
+        return group.uploadImage(WordCloudUtils.generateWordCloud(texts).toExternalResource("png"))
     }
 
 }
