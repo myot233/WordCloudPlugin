@@ -1,4 +1,4 @@
 {
-  "version":"0.0.7",
-  "description": "n"
+  "version":"0.0.8",
+  "description": "大概修复了出现多次定时任务的情况"
 }

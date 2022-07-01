@@ -8,6 +8,7 @@ import net.mamoe.mirai.console.command.CommandSender.Companion.asCommandSender
 import net.mamoe.mirai.console.command.CommandSender.Companion.toCommandSender
 import net.mamoe.mirai.console.command.descriptor.ExperimentalCommandDescriptors
 import net.mamoe.mirai.console.data.PluginDataStorage
+import net.mamoe.mirai.console.extension.PluginComponentStorage
 import net.mamoe.mirai.console.plugin.id
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
@@ -38,7 +39,7 @@ import kotlin.concurrent.timerTask
 object WordCloudPlugin : KotlinPlugin(JvmPluginDescription(
     id = "com.github.WordCloudPlugin",
     name = "WordCloudPlugin",
-    version = "0.0.7",
+    version = "0.0.8",
 ) {
     author("gsycl2004")
     info("""a plugin that can easily generate wordcloud image of group""")
@@ -57,8 +58,11 @@ object WordCloudPlugin : KotlinPlugin(JvmPluginDescription(
     }
 
 
+
+
     @OptIn(ConsoleExperimentalApi::class, ExperimentalCommandDescriptors::class)
     override fun onEnable() {
+
         TimerConfig.reload()
         val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
         globalEventChannel().subscribe<BotOnlineEvent> {
@@ -79,7 +83,7 @@ object WordCloudPlugin : KotlinPlugin(JvmPluginDescription(
                     }
                 }
             }
-            return@subscribe ListeningStatus.LISTENING
+            return@subscribe ListeningStatus.STOPPED
         }
 
         Class.forName("org.sqlite.JDBC")
