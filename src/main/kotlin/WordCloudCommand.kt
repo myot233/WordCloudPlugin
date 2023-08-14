@@ -4,6 +4,7 @@ import net.mamoe.mirai.console.command.CommandSenderOnMessage
 import net.mamoe.mirai.console.command.CompositeCommand
 import net.mamoe.mirai.console.command.GroupTempCommandSender
 import net.mamoe.mirai.console.command.MemberCommandSender
+import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.User
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.Image
@@ -35,6 +36,7 @@ object WordCloudCommand : CompositeCommand(
         sendMessage(
             genPerson(
                 user,
+                group,
                 LocalDate.parse(from),
                 LocalDate.parse(to)
             )
@@ -55,19 +57,19 @@ object WordCloudCommand : CompositeCommand(
 
     @SubCommand("个人昨日词云")
     suspend fun MemberCommandSender.genPersonYesterday(user: User) {
-        sendMessage(genPerson(user, LocalDate.now().minusDays(1), LocalDate.now().minusDays(1)))
+        sendMessage(genPerson(user, group, LocalDate.now().minusDays(1), LocalDate.now().minusDays(1)))
     }
 
     @SubCommand("个人本月词云")
     suspend fun MemberCommandSender.genPersonMonth(user: User) {
-        sendMessage(genPerson(user, LocalDate.now().withDayOfMonth(1), LocalDate.now().let {
+        sendMessage(genPerson(user, group, LocalDate.now().withDayOfMonth(1), LocalDate.now().let {
             it.withDayOfMonth(it.lengthOfMonth())
         }))
     }
 
     @SubCommand("个人本日词云")
     suspend fun MemberCommandSender.genPersonToday(user: User) {
-        sendMessage(genPerson(user, LocalDate.now(), LocalDate.now()))
+        sendMessage(genPerson(user, group, LocalDate.now(), LocalDate.now()))
     }
 
     @SubCommand("本日词云")
@@ -88,12 +90,13 @@ object WordCloudCommand : CompositeCommand(
 
     private suspend fun MemberCommandSender.genPerson(
         user: User,
+        group: Group,
         from: LocalDate,
         to: LocalDate
     ): Image {
         val sequence = WordCloudTable.connect()
         val texts = sequence.filter {
-            it.sender_id eq user.id
+            (it.sender_id eq user.id) and (it.group_id eq group.id)
         }.filter {
             it.time between from..to
         }.map { it.text }.toList()
