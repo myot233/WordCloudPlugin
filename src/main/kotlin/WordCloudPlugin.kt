@@ -94,7 +94,7 @@ object WordCloudPlugin : KotlinPlugin(JvmPluginDescription(
         WordCloudCommand.register()
         CommandAliasConfig.reload()
         globalEventChannel().subscribe<GroupMessageEvent> {
-            val string = message.contentToString()
+            val string = message.filterIsInstance<PlainText>().joinToString { it.contentToString() }
             var containOne = false
             WordCloudConfig.regexs.forEach {
                 containOne = containOne || string.contains(it.toRegex())
